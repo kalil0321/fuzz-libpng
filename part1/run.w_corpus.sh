@@ -2,9 +2,10 @@
 export PROJECT=libpng
 export CORPUS=build/out/corpus
 export HARNESS=libpng_read_fuzzer
+export REPOSITORY=https://github.com/hamzaremmal/fuzz-libpng.git
 
 # clone the oss-fuzz repository with corpus
-git clone https://github.com/hamzaremmal/fuzz-libpng.git -b oss-fuzz/with-corpus oss-fuzz
+git clone $REPOSITORY -b oss-fuzz/with-corpus oss-fuzz
 # operate on the oss-fuzz repository
 cd oss-fuzz
 # build the image for libpng
