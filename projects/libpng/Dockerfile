@@ -18,7 +18,7 @@ FROM gcr.io/oss-fuzz-base/base-builder@sha256:60965728fe2f95a1aff980e33f7c16ba37
 RUN apt-get update && \
     apt-get install -y make autoconf automake libtool zlib1g-dev
 
-RUN git clone --depth 1 https://github.com/madler/zlib.git
+RUN git clone --depth 1 https://github.com/hamzaremmal/fuzz-libpng.git -b zlib zlib
 RUN git clone --depth 1 https://github.com/hamzaremmal/fuzz-libpng.git -b libpng/with-corpus libpng
 RUN cp libpng/contrib/oss-fuzz/build.sh $SRC
 WORKDIR libpng
