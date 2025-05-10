@@ -1,5 +1,4 @@
 #!/bin/bash
-set -euo pipefail
 
 # CREATE A WORKING DIRECTORY
 export WORKDIR="$(mktemp -d)"
