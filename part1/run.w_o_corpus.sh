@@ -1,21 +1,80 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+###################################################################################################
+############################## CONFIGURE A TEMPORARY WORK DIRECTORY ###############################
+###################################################################################################
+export WORKDIR="$(mktemp -d)"
+echo "Using temp directory: $WORKDIR"
+
+cleanup() {
+    echo "cleaning the working directory: $WORKDIR"
+    rm -rf "$WORKDIR";
+}
+trap cleanup EXIT
+
+cd "$WORKDIR"
+
+###################################################################################################
+###################################### CONFIGURE THE SCRIPT #######################################
+###################################################################################################
+
 # configure the script
 export PROJECT=libpng
-export CORPUS=build/out/corpus
+export CORPUS="$WORKDIR/build/out/corpus"
 export HARNESS=libpng_read_fuzzer
 export REPOSITORY=https://github.com/hamzaremmal/fuzz-libpng.git
-export DURATION=4h
+export DURATION=10 #14400  # 4 hours in seconds (4 * 60 * 60)
+export ARCHITECTURE=aarch64
+
+###################################################################################################
+########################################## FUZZING SCRIPT #########################################
+###################################################################################################
+
+# Make sure the corpus directory exists
+echo "Making sure the corpus directory exists"
+mkdir -p "$CORPUS"
 
 # clone the oss-fuzz repository with corpus
-git clone $REPOSITORY -b oss-fuzz/without-corpus oss-fuzz
-# operate on the oss-fuzz repository
+echo "Cloning the oss-fuzz tree from $REPOSITORY"
+git clone --depth 1 "$REPOSITORY" -b oss-fuzz/without-corpus oss-fuzz
 cd oss-fuzz
+
 # build the image for libpng
-python3 infra/helper.py build_image --no-pull $PROJECT
+# NOTE: this builds for the host architecture anyways
+echo "Building images for project: $PROJECT"
+python3 infra/helper.py build_image \
+    --no-pull \
+    --architecture "$ARCHITECTURE" \
+    "$PROJECT"
+
 # build the fuzzers for libpng
-python3 infra/helper.py build_fuzzers --no-pull $PROJECT
+echo "Building fuzzers for project: $PROJECT"
+python3 infra/helper.py build_fuzzers \
+    --clean \
+    --architecture "$ARCHITECTURE" \
+    "$PROJECT"
+
 # run the fuzzer for 4 hours
-timeout --preserve-status $DURATION python3 infra/helper.py run_fuzzer $PROJECT $HARNESS --corpus-dir $CORPUS
+echo "Running fuzzer for project '$PROJECT' with harness '$HARNESS'"
+python3 infra/helper.py run_fuzzer \
+    --architecture "$ARCHITECTURE" \
+    --corpus-dir "$CORPUS" \
+    "$PROJECT" "$HARNESS" \
+    -e FUZZER_ARGS=-max_total_time=$DURATION \
+
 # build the fuzzer for coverage
-python3 infra/helper.py build_fuzzers --sanitizer coverage $PROJECT
+echo "Building the coverage fuzzer for project: $PROJECT"
+python3 infra/helper.py build_fuzzers \
+    --architecture "$ARCHITECTURE" \
+    --sanitizer coverage \
+    "$PROJECT"
+
 # build the coverage
-python3 infra/helper.py coverage $PROJECT --corpus-dir $CORPUS --fuzz-target $HARNESS
+echo "Building the coverage for project '$PROJECT' for harness '$HARNESS'"
+python3 infra/helper.py coverage \
+    --architecture "$ARCHITECTURE" \
+    --corpus-dir "$CORPUS" \
+    --fuzz-target "$HARNESS" \
+    --no-corpus-download \
+    "$PROJECT"
