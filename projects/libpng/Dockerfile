@@ -14,7 +14,7 @@
 #
 ################################################################################
 
-FROM gcr.io/oss-fuzz-base/base-builder
+FROM gcr.io/oss-fuzz-base/base-builder@sha256:60965728fe2f95a1aff980e33f7c16ba378b57b4b4c9e487b44938a4772d0d2d
 RUN apt-get update && \
     apt-get install -y make autoconf automake libtool zlib1g-dev
 
