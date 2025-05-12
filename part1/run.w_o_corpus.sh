@@ -37,7 +37,7 @@ mkdir -p "$CORPUS"
 
 # clone the oss-fuzz repository with corpus
 echo "Cloning the oss-fuzz tree from $REPOSITORY"
-git clone --depth 1 "$REPOSITORY" -b oss-fuzz/without-corpus oss-fuzz
+git clone --depth 1 "$REPOSITORY" -b without-corpus/oss-fuzz oss-fuzz
 cd oss-fuzz
 
 # build the image for libpng
