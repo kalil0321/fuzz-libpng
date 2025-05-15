@@ -25,7 +25,6 @@ export CORPUS="$WORKDIR/build/out/corpus"
 export HARNESS=libpng_read_fuzzer
 export REPOSITORY=https://github.com/hamzaremmal/fuzz-libpng.git
 export DURATION=14400  # 4 hours in seconds (4 * 60 * 60)
-export ARCHITECTURE=aarch64
 
 ###################################################################################################
 ########################################## FUZZING SCRIPT #########################################
@@ -45,20 +44,17 @@ cd oss-fuzz
 echo "Building images for project: $PROJECT"
 python3 infra/helper.py build_image \
     --no-pull \
-    --architecture "$ARCHITECTURE" \
     "$PROJECT"
 
 # build the fuzzers for libpng
 echo "Building fuzzers for project: $PROJECT"
 python3 infra/helper.py build_fuzzers \
     --clean \
-    --architecture "$ARCHITECTURE" \
     "$PROJECT"
 
 # run the fuzzer for 4 hours
 echo "Running fuzzer for project '$PROJECT' with harness '$HARNESS'"
 python3 infra/helper.py run_fuzzer \
-    --architecture "$ARCHITECTURE" \
     --corpus-dir "$CORPUS" \
     "$PROJECT" "$HARNESS" \
     -e FUZZER_ARGS=-max_total_time=$DURATION \
@@ -66,14 +62,12 @@ python3 infra/helper.py run_fuzzer \
 # build the fuzzer for coverage
 echo "Building the coverage fuzzer for project: $PROJECT"
 python3 infra/helper.py build_fuzzers \
-    --architecture "$ARCHITECTURE" \
     --sanitizer coverage \
     "$PROJECT"
 
 # build the coverage
 echo "Building the coverage for project '$PROJECT' for harness '$HARNESS'"
 python3 infra/helper.py coverage \
-    --architecture "$ARCHITECTURE" \
     --corpus-dir "$CORPUS" \
     --fuzz-target "$HARNESS" \
     --no-corpus-download \
