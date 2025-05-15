@@ -49,7 +49,7 @@ EOF
 python3 infra/helper.py build_image libpng
 
 # Build fuzzers with UBSan
-python3 infra/helper.py build_fuzzers libpng --sanitizer undefined libpng
+python3 infra/helper.py build_fuzzers libpng --sanitizer undefined
 
 # Reproduce crash
 python3 infra/helper.py reproduce libpng libpng_read_fuzzer poc_crash
