@@ -24,7 +24,7 @@ export PROJECT=libpng
 export CORPUS="$WORKDIR/build/out/corpus"
 export HARNESS=libpng_read_fuzzer
 export REPOSITORY=https://github.com/hamzaremmal/fuzz-libpng.git
-export DURATION=10 #14400  # 4 hours in seconds (4 * 60 * 60)
+export DURATION=14400  # 4 hours in seconds (4 * 60 * 60)
 export ARCHITECTURE=aarch64
 
 ###################################################################################################
